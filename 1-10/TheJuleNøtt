@@ -1,0 +1,64 @@
+import time
+import itertools
+from math import ceil,sqrt
+
+#n,p=10**4,[2,3,5]
+#time0=time.time()
+"""
+def prime(num,primes):
+    for i in primes:
+        if num % i==0: return False
+        if i>ceil(sqrt(num)): return True
+for num in range(3,n,2):
+    if prime(num,p): p.append(num)
+"""
+
+def erat2():
+    D = {  }
+    yield 2
+    for q in itertools.islice(itertools.count(3), 0, None, 2):
+        p = D.pop(q, None)
+        if p is None:
+            D[q*q] = q
+            yield q
+        else:
+            x = p + q
+            while x in D or not (x&1):
+                x += p
+            D[x] = p
+
+def get_primes_erat(n):
+    return list(itertools.takewhile(lambda p: p<n, erat2()))
+
+def bSearch(x, P, L, U):
+    half=(L + U) //2
+    l_index,u_index=L,U
+    while True:
+        if P[half]==x:return half
+        if P[half +1]>x:
+            u_index=half +1
+        if P[half]<x:
+            l_index = half
+        if P[half +1]>x>P[half]:
+            return half
+        if P[half+2]>x>P[half+1]: return half+1
+        half=(l_index + u_index) // 2
+
+def main():
+    p=get_primes_erat(10**4)
+    P=get_primes_erat(10**8)
+    print("Done Primes",len(p),len(P))
+    L, U, result = 0, len(P), 0
+    for i in p:
+        t0=time.time()
+        U = bSearch((10 ** 8) / i, P, L, U)
+        #print("U:",time.time()-t0)
+        t0=time.time()
+        for x in range(L, U):
+            if P[x] * i >= 10 ** 8: print("Error")
+            result += 1
+        #print("Prime:",time.time()-t0)
+        L += 1
+        print(U,L)
+    print(result)
+main()
